@@ -1,137 +1,62 @@
 <?php
-/**
- * @package		Joomla.Administrator
- * @subpackage	com_installer
- * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
- * @license		GNU General Public License, see LICENSE.php
- */
 
-// No direct access
 defined('_JEXEC') or die;
 
-/**
- * @package		Joomla.Administrator
- * @subpackage	com_installer
- */
+include(JPATH_COMPONENT . '/helpers/control.php');
+
 class ControlControllerUpdate extends JController {
 
-	/**
-	 * Update a set of extensions.
-	 *
-	 * @since	1.6
-	 */
-	function update()
-	{ die('startup sequence');
-		// Check for request forgeries
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+    private $_jinput = null;
+    private $_token = '';
 
-		$model	= $this->getModel('update');
-		$uid	= JRequest::getVar('cid', array(), '', 'array');
+    function __construct() {
+        // Check for the token.
+        $this->_jinput = JFactory::getApplication()->input;
+        $this->_token = $this->_jinput->get('token', '', 'STRING');
+        ControlHelper::checkToken($this->_token) or jexit(JText::_('JINVALID_TOKEN'));
+        
+        parent::__construct();
+    }
 
-		JArrayHelper::toInteger($uid, array());
-		if ($model->update($uid)) {
-			$cache = JFactory::getCache('mod_menu');
-			$cache->clean();
-		}
+    function check() {
+        // Setup the Model & View
+        $model = & $this->getModel('update');
+        $view = & $this->getView('check', 'raw');
+        $view->setModel($model, true);
 
-		$app = JFactory::getApplication();
-		$redirect_url = $app->getUserState('com_installer.redirect_url');
-		if(empty($redirect_url)) {
-			$redirect_url = JRoute::_('index.php?option=com_installer&view=update', false);
-		} else
-		{
-			// wipe out the user state when we're going to redirect
-			$app->setUserState('com_installer.redirect_url', '');
-			$app->setUserState('com_installer.message', '');
-			$app->setUserState('com_installer.extension_message', '');
-		}
-		$this->setRedirect($redirect_url);
-	}
+        // Purge updates
+        $model->purge();
+        $model->enableSites();
 
-	/**
-	 * Find new updates.
-	 *
-	 * @since	1.6
-	 */
-	function find()
-	{
-		// Check for request forgeries
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
-		// Get the caching duration
-		jimport('joomla.application.component.helper');
-		$component = JComponentHelper::getComponent('com_installer');
-		$params = $component->params;
-		$cache_timeout = $params->get('cachetimeout', 6, 'int');
-		$cache_timeout = 3600 * $cache_timeout;
-		// Find updates
-		$model	= $this->getModel('update');
-		$result = $model->findUpdates(0, $cache_timeout);
-		$this->setRedirect(JRoute::_('index.php?option=com_installer&view=update', false));
-		//$view->display();
-	}
+        // Get the caching duration
+        jimport('joomla.application.component.helper');
+        $component = JComponentHelper::getComponent('com_installer');
+        $params = $component->params;
+        $cache_timeout = $params->get('cachetimeout', 6, 'int');
+        $cache_timeout = 3600 * $cache_timeout;
 
-	/**
-	 * Purges updates.
-	 *
-	 * @since	1.6
-	 */
-	function purge()
-	{
-		// Purge updates
-		// Check for request forgeries
-		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
-		$model = $this->getModel('update');
-		$model->purge();
-		$model->enableSites();
-		$this->setRedirect(JRoute::_('index.php?option=com_installer&view=update', false), $model->_message);
-	}
+        // Find updates
+        $result = $model->findUpdates(0, $cache_timeout);
+        
+        // Display the view
+        $view->display();
+    }
 
-	/**
-	 * Fetch and report updates in JSON format, for AJAX requests
-	 *
-	 * @return void
-	 *
-	 * @since 2.5
-	 */
-	function ajax()
-	{
-		// Note: we don't do a token check as we're fetching information
-		// asynchronously. This means that between requests the token might
-		// change, making it impossible for AJAX to work.
+    function update() {
+        // Setup the Model and get the update ID
+        $model = & $this->getModel('update');
+        $uid = $this->_jinput->get('cid', array(), 'ARRAY');
 
-		$eid = JRequest::getInt('eid', 0);
-		$skip = JRequest::getVar('skip', array(), 'default', 'array');
+        JArrayHelper::toInteger($uid, array());
+        if ($model->update($uid)) {
+            $cache = JFactory::getCache('mod_menu');
+            $cache->clean();
 
-		$cache_timeout = JRequest::getInt('cache_timeout', 0);
-		if($cache_timeout == 0) {
-			jimport('joomla.application.component.helper');
-			$component = JComponentHelper::getComponent('com_installer');
-			$params = $component->params;
-			$cache_timeout = $params->get('cachetimeout', 6, 'int');
-			$cache_timeout = 3600 * $cache_timeout;
-		}
+            // ??
+            return '1';
+        } else {
+            return '0';
+        }
+    }
 
-		$model = $this->getModel('update');
-		$result = $model->findUpdates($eid, $cache_timeout);
-
-		$model->setState('list.start', 0);
-		$model->setState('list.limit', 0);
-		if($eid != 0) {
-			$model->setState('filter.extension_id', $eid);
-		}
-		$updates = $model->getItems();
-
-		if(!empty($skip)) {
-			$unfiltered_updates = $updates;
-			$updates = array();
-
-			foreach($unfiltered_updates as $update) {
-				if(!in_array($update->extension_id, $skip)) $updates[] = $update;
-			}
-		}
-
-		echo json_encode($updates);
-
-		JFactory::getApplication()->close();
-	}
 }

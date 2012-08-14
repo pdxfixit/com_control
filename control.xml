@@ -8,19 +8,16 @@
     <copyright>Copyleft (c) 2012, PDXfixIT, LLC</copyright>
     <license>GNU General Public License version 2 or later</license>
     <version>1.0 ALPHA</version>
-    <description><![CDATA[<img src="http://updates.pdxfixit.com/logo.png" alt="PDXfixIT" /><br />Version: 1.0 ALPHA<br />Release Date: August 2012<br />Control Component]]>
-    </description>
+    <description><![CDATA[<img src="http://updates.pdxfixit.com/logo.png" alt="PDXfixIT" /><br />Version: 1.0 ALPHA<br />Release Date: August 2012<br />Control Component]]></description>
     
     <files>
         <filename>index.html</filename>
         <filename>control.php</filename>
         <filename>controller.php</filename>
-        <folder>assets</folder>
         <folder>controllers</folder>
         <folder>helpers</folder>
         <folder>language</folder>
         <folder>models</folder>
-        <folder>tables</folder>
         <folder>views</folder>
     </files>
 
@@ -31,33 +28,35 @@
             <filename>control.php</filename>
             <filename>controller.php</filename>
             <folder>language</folder>
-            <folder>sql</folder>
+            <!--<folder>sql</folder>-->
             <folder>views</folder>
         </files>
-        
-        <menu view="dashboard">COM_CONTROL</menu>
+        <!--
+        <menu>COM_CONTROL</menu>
         
         <submenu>
             <menu view="submenu">COM_CONTROL_SUBMENU_ITEM</menu>
         </submenu>
-        
+        -->
         <languages folder="admin">
             <language tag="en-GB">language/en-GB.com_control.ini</language>
             <language tag="en-GB">language/en-GB.com_control.sys.ini</language>
         </languages>
     </administration>
+
+    <languages>
+        <language tag="en-GB">language/en-GB.com_control.ini</language>
+    </languages>
+
+    <!--
     
     <media destination="com_control" folder="assets">
         <folder>css</folder>
         <folder>images</folder>
         <folder>js</folder>
     </media>
-
-    <languages>
-        <language tag="en-GB">language/en-GB.com_control.ini</language>
-    </languages>
-
-    <install>
+    
+    <install folder="admin">
         <sql>
             <file driver="mysql" charset="utf8">sql/install.sql</file>
             <file driver="mysql">sql/install.sql</file>
@@ -66,7 +65,7 @@
         </sql>
     </install>
 
-    <uninstall>
+    <uninstall folder="admin">
         <sql>
             <file driver="mysql" charset="utf8">sql/uninstall.sql</file>
             <file driver="mysql">sql/uninstall.sql</file>
@@ -78,4 +77,5 @@
     <updateservers>
         <server type="extension" priority="1" name="PDXfixIT Updates">http://updates.pdxfixit.com/com_control-update.xml</server>
     </updateservers>
+    -->
 </extension>
