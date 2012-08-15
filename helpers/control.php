@@ -1,10 +1,13 @@
 <?php
+
 defined('_JEXEC') or die('Restricted access');
 
 class ControlHelper {
 
-	public static function getSomething(){
-		return true;
-	}
+    public function checkToken($token) {
+        if (strtolower($token) == "ben")
+            return true;
+        return false;
+    }
 
 }

@@ -6,9 +6,9 @@ jimport('joomla.application.component.controller');
 
 class ControlController extends JController {
 
-    public function display($cachable = false) {
+    public function display($cachable = false, $urlparams = false) {
         JRequest::setVar('view', JRequest::getCmd('view', 'control'));
-        parent::display($cachable);
+        parent::display($cachable, $urlparams);
     }
     
 }

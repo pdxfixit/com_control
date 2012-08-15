@@ -6,10 +6,6 @@ require(JPATH_ADMINISTRATOR . '/components/com_installer/models/update.php');
 
 class ControlModelUpdate extends InstallerModelUpdate {
 
-    public function __construct($config = array()) {
-        parent::__construct($config);
-    }
-
     public function getListQuery() {
         $db = & $this->getDbo();
         $query = $db->getQuery(true);

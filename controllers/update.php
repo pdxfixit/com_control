@@ -14,7 +14,6 @@ class ControlControllerUpdate extends JController {
         $this->_jinput = JFactory::getApplication()->input;
         $this->_token = $this->_jinput->get('token', '', 'STRING');
         ControlHelper::checkToken($this->_token) or jexit(JText::_('JINVALID_TOKEN'));
-        
         parent::__construct();
     }
 
